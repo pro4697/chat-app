@@ -20,10 +20,10 @@ export class MainPanel extends Component {
 						overflowY: 'auto',
 					}}
 				>
-					?
+					MainPanel
 				</div>
 
-				<MessageHeader />
+				<MessageForm />
 			</div>
 		);
 	}

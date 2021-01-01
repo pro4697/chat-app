@@ -115,3 +115,19 @@ body {
 .auth-wrapper input[type='submit'] {
 	-webkit-appearance: none;
 }
+
+.message-form-button {
+	background: #7a84eb;
+	color: white;
+	text-transform: uppercase;
+	border: none;
+	margin-top: 40px;
+	padding: 10px 15px;
+	font-size: 16px;
+	font-weight: 100;
+	letter-spacing: 10px;
+}
+
+.message-form-button:hover {
+	background: #636ee6;
+}
