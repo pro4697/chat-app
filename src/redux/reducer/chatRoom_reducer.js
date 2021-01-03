@@ -1,7 +1,7 @@
 import { SET_CURRENT_CHAT_ROOM } from '../actions/types';
 
 const initialChatRoomState = {
-	CurrentChatRoom: null,
+	currentChatRoom: null,
 };
 
 export default function (state = initialChatRoomState, action) {
@@ -9,7 +9,7 @@ export default function (state = initialChatRoomState, action) {
 		case SET_CURRENT_CHAT_ROOM:
 			return {
 				...state,
-				CurrentChatRoom: action.payload,
+				currentChatRoom: action.payload,
 			};
 		default:
 			return state;

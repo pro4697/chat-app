@@ -17,8 +17,6 @@ function App(props) {
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged((user) => {
-			console.log('user', user);
-
 			// 로그인이 된 상태
 			if (user) {
 				history.push('/');
