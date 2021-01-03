@@ -7,6 +7,7 @@ import firebase from '../../../firebase';
 function MessageForm() {
 	const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
 	const user = useSelector((state) => state.user.currentUser);
+	const isPrivateChatRoom = useSelector((state) => state.chatRoom.isPrivateChatRoom);
 	const inputOpenImageRef = useRef();
 	const [content, setContent] = useState('');
 	const [errors, setErrors] = useState([]);
@@ -65,13 +66,21 @@ function MessageForm() {
 		inputOpenImageRef.current.click();
 	};
 
+	const getPath = () => {
+		if (isPrivateChatRoom) {
+			return `message/private/${chatRoom.id}`;
+		} else {
+			return `message/public/`;
+		}
+	};
+
 	const handleUploadImage = (e) => {
 		const file = e.target.files[0];
 		if (!file) {
 			return;
 		}
 		setLoading(true);
-		const filePath = `message/public/${file.name}`;
+		const filePath = `${getPath()}/${file.name}`;
 		const metadata = { contentType: mine.lookup(file.name) };
 
 		try {

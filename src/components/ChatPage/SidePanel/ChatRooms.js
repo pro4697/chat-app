@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { FaRegSmileWink, FaPlus } from 'react-icons/fa';
 import firebase from 'firebase';
-import { setCurrentChatRoom } from '../../../redux/actions/chatRoom_action';
+import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action';
 
 export class ChatRooms extends Component {
 	state = {
@@ -91,6 +91,7 @@ export class ChatRooms extends Component {
 
 	changeChatRoom = (room) => {
 		this.props.dispatch(setCurrentChatRoom(room));
+		this.props.dispatch(setPrivateChatRoom(false));
 		this.setState({ activeChatRoomId: room.id });
 	};
 
@@ -100,7 +101,7 @@ export class ChatRooms extends Component {
 			<li
 				onClick={() => this.changeChatRoom(room)}
 				key={room.id}
-				style={{ backgroundColor: room.id === this.state.activeChatRoomId && '#ffffff45' }}
+				style={{ backgroundColor: room.id === this.state.activeChatRoomId && !this.props.isPrivate && '#ffffff45' }}
 			>
 				# {room.name}
 			</li>
@@ -159,6 +160,7 @@ export class ChatRooms extends Component {
 const mapStateToProps = (state) => {
 	return {
 		user: state.user.currentUser,
+		isPrivate: state.chatRoom.isPrivateChatRoom,
 	};
 };
 

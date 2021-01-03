@@ -17,13 +17,12 @@ function App(props) {
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged((user) => {
-			// 로그인이 된 상태
 			if (user) {
-				history.push('/');
 				dispatch(setUser(user));
+				history.push('/');
 			} else {
-				history.push('/login');
 				dispatch(clearUser());
+				history.push('/login');
 			}
 		});
 	}, []);

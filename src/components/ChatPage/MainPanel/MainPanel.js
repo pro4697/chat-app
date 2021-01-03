@@ -48,7 +48,7 @@ export class MainPanel extends Component {
 
 	renderMessages = (messages) =>
 		messages.length > 0 &&
-		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user} />);
+		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user | null} />);
 
 	render() {
 		const { messages, searchTerm, searchResults } = this.state;
