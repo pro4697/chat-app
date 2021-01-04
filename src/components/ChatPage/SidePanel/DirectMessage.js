@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FaRegSmile } from 'react-icons/fa';
+import { RiChatPrivateFill } from 'react-icons/ri';
 import firebase from '../../../firebase';
-import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action';
+import { setCurrentChatRoom, setChatRoomType } from '../../../redux/actions/chatRoom_action';
 export class DirectMessage extends Component {
 	state = {
 		users: [],
@@ -43,7 +43,7 @@ export class DirectMessage extends Component {
 			name: user.name,
 		};
 		this.props.dispatch(setCurrentChatRoom(chatRoomData));
-		this.props.dispatch(setPrivateChatRoom(true));
+		this.props.dispatch(setChatRoomType('private'));
 		this.setActiveChatRoom(user.uid);
 	};
 
@@ -56,7 +56,14 @@ export class DirectMessage extends Component {
 		users.map((user) => (
 			<li
 				onClick={() => this.changeChatRoom(user)}
-				style={{ backgroundColor: user.uid === this.state.activeChatRoom && this.props.isPrivate && '#ffffff45' }}
+				style={{
+					backgroundColor:
+						user.uid === this.state.activeChatRoom && this.props.chatRoomType === 'private' && '#ffffff45',
+					marginLeft: '10px',
+					paddingLeft: '10px',
+					borderRadius: '5px',
+					cursor: 'pointer',
+				}}
 				key={user.uid}
 			>
 				# {user.name}
@@ -68,7 +75,7 @@ export class DirectMessage extends Component {
 		return (
 			<div>
 				<span style={{ display: 'flex', alignItems: 'center' }}>
-					<FaRegSmile style={{ marginRight: '3px' }} /> DIRECT MESSAGES (1)
+					<RiChatPrivateFill style={{ marginRight: '3px' }} /> DIRECT MESSAGES
 				</span>
 				<ul style={{ listStyleType: 'none', padding: 0 }}>{this.renderDirectMessages(users)}</ul>
 			</div>
@@ -79,7 +86,7 @@ export class DirectMessage extends Component {
 const mapStateToProps = (state) => {
 	return {
 		user: state.user.currentUser,
-		isPrivate: state.chatRoom.isPrivateChatRoom,
+		chatRoomType: state.chatRoom.chatRoomType,
 	};
 };
 

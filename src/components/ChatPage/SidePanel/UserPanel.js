@@ -46,9 +46,8 @@ function UserPanel() {
 
 	return (
 		<div>
-			{/* Logo */}
 			<h3 style={{ color: 'white' }}>
-				<IoIosChatboxes /> Chat App
+				<IoIosChatboxes style={{ marginBottom: '5px' }} /> Chat App
 			</h3>
 
 			<div style={{ display: 'flex', marginBottom: '1rem' }}>

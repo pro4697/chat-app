@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { FaRegSmileWink, FaPlus } from 'react-icons/fa';
-import firebase from 'firebase';
-import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoom_action';
+import { Modal, Button, Form, Badge } from 'react-bootstrap';
+import { FaPlus } from 'react-icons/fa';
+import { RiChat3Fill } from 'react-icons/ri';
+import firebase from '../../../firebase';
+import { setCurrentChatRoom, setChatRoomType } from '../../../redux/actions/chatRoom_action';
 
 export class ChatRooms extends Component {
 	state = {
@@ -14,8 +13,10 @@ export class ChatRooms extends Component {
 		name: '',
 		description: '',
 		chatRoomsRef: firebase.database().ref('chatRooms'),
+		messagesRef: firebase.database().ref('messages'),
 		chatRooms: [],
 		activeChatRoomId: '',
+		notifications: [], // [방의정보(chatRooms), 알림정보(notifications)] chatRoom과 인덱스 공유
 	};
 
 	componentDidMount() {
@@ -24,6 +25,9 @@ export class ChatRooms extends Component {
 
 	componentWillUnmount() {
 		this.state.chatRoomsRef.off();
+		this.state.chatRooms.forEach((chatRoom) => {
+			this.state.messagesRef.child(chatRoom.id).off();
+		});
 	}
 
 	setFirstChatRoom = () => {
@@ -44,7 +48,48 @@ export class ChatRooms extends Component {
 		this.state.chatRoomsRef.on('child_added', (DataSnapshot) => {
 			chatRoomList.push(DataSnapshot.val());
 			this.setState({ chatRooms: chatRoomList }, () => this.setFirstChatRoom());
+			this.addNotificationListener(DataSnapshot.key);
 		});
+	};
+
+	addNotificationListener = (chatRoomId) => {
+		this.state.messagesRef.child(chatRoomId).on('value', (DataSnapshot) => {
+			if (this.props.chatRoom) {
+				this.handleNotifications(chatRoomId, this.props.chatRoom.id, this.state.notifications, DataSnapshot);
+			}
+		});
+	};
+
+	handleNotifications = (chatRoomId, currentChatRoomId, notifications, DataSnapshot) => {
+		// 이미 알림정보가 들어있는 방과 아닌 채팅방 구분
+		let index = notifications.findIndex((notification) => notification.id === chatRoomId);
+
+		// chatRoomId에 해당하는 채팅방의 알림 정보가 없을때
+		if (index === -1) {
+			notifications.push({
+				id: chatRoomId,
+				total: DataSnapshot.numChildren(), // 총 메시지 갯수
+				lastKnownTotal: DataSnapshot.numChildren(), // 마지막으로 확인한 메시지 갯수
+				count: 0, // 알림 벳지에 표시할 메시지 갯수
+			});
+		}
+		// 이미 해당 채팅방의 알림 정보가 있을때
+		else {
+			// 현재 접속한 방 이외에서 메시지가 올때
+			if (chatRoomId !== currentChatRoomId) {
+				// 현재까지 유저가 확인한 총 메시지 개수
+				let lastTotal = notifications[index].lastKnownTotal;
+
+				// count (알림으로 보여줄 숫자)
+				// 현재 총 메시지 개수 - 이전에 확인한 총 메시지 개수 > 0
+				if (DataSnapshot.numChildren() - lastTotal > 0) {
+					notifications[index].count = DataSnapshot.numChildren() - lastTotal;
+				}
+			}
+			// total property에 현재 전체 미시지 개수 넣기
+			notifications[index].total = DataSnapshot.numChildren();
+		}
+		this.setState({ notifications });
 	};
 
 	handleClose = () => this.setState({ show: false });
@@ -87,38 +132,79 @@ export class ChatRooms extends Component {
 			alert(error);
 		}
 	};
+
 	isFormValid = (name, description) => name && description;
 
 	changeChatRoom = (room) => {
 		this.props.dispatch(setCurrentChatRoom(room));
-		this.props.dispatch(setPrivateChatRoom(false));
+		this.props.dispatch(setChatRoomType('public'));
 		this.setState({ activeChatRoomId: room.id });
+		this.clearNotifications(room);
 	};
 
-	renderChatRooms = (chatRooms) =>
-		chatRooms.length > 0 &&
-		chatRooms.map((room) => (
-			<li
-				onClick={() => this.changeChatRoom(room)}
-				key={room.id}
-				style={{ backgroundColor: room.id === this.state.activeChatRoomId && !this.props.isPrivate && '#ffffff45' }}
-			>
-				# {room.name}
-			</li>
-		));
+	clearNotifications = (room) => {
+		let index = this.state.notifications.findIndex((notification) => notification.id === room.id);
+
+		if (index !== -1) {
+			let updatedNotifications = [...this.state.notifications];
+			updatedNotifications[index].lastKnownTotal = this.state.notifications[index].total;
+			updatedNotifications[index].count = 0;
+			this.setState({ notifications: updatedNotifications });
+		}
+	};
+
+	getNotificationCount = (room) => {
+		// 해당 채팅방의 count수 구하기
+		let count;
+
+		this.state.notifications.forEach((notification) => {
+			if (notification.id === room.id) {
+				count = notification.count;
+			}
+		});
+
+		if (count > 0) {
+			return count;
+		}
+	};
+
+	renderChatRooms = (chatRooms) => {
+		return (
+			chatRooms.length > 0 &&
+			chatRooms.map((room) => (
+				<li
+					onClick={() => this.changeChatRoom(room)}
+					key={room.id}
+					style={{
+						backgroundColor:
+							room.id === this.state.activeChatRoomId && this.props.chatRoomType === 'public' && '#ffffff45',
+						marginLeft: '10px',
+						paddingLeft: '10px',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{`# ${room.name}`}
+					<Badge style={{ float: 'right', marginTop: '3px', marginRight: '2px' }} variant='danger'>
+						{this.getNotificationCount(room)}
+					</Badge>
+				</li>
+			))
+		);
+	};
 
 	render() {
 		return (
 			<div>
 				<div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
-					<FaRegSmileWink style={{ marginRight: '3px' }} />
-					CHAT ROOMS (1)
+					<RiChat3Fill style={{ marginRight: '3px' }} />
+					CHAT ROOMS {`(${this.state.chatRooms.length})`}
 					<FaPlus onClick={this.handleShow} style={{ position: 'absolute', right: '0', cursor: 'pointer' }} />
 				</div>
 
 				<ul style={{ listStyleType: 'none', padding: 0 }}>{this.renderChatRooms(this.state.chatRooms)}</ul>
 
-				{/* 채팅탕 추가 modal */}
+				{/* 채팅창 추가 modal */}
 				<Modal show={this.state.show} onHide={this.handleClose}>
 					<Modal.Header closeButton>
 						<Modal.Title>채팅방 생성</Modal.Title>
@@ -160,7 +246,8 @@ export class ChatRooms extends Component {
 const mapStateToProps = (state) => {
 	return {
 		user: state.user.currentUser,
-		isPrivate: state.chatRoom.isPrivateChatRoom,
+		chatRoom: state.chatRoom.currentChatRoom,
+		chatRoomType: state.chatRoom.chatRoomType,
 	};
 };
 

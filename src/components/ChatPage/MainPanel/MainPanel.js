@@ -4,6 +4,7 @@ import MessageHeader from './MessageHeader';
 import Message from './Message';
 import MessageForm from './MessageForm';
 import firebase from '../../../firebase';
+import { setUserPosts } from '../../../redux/actions/chatRoom_action';
 
 export class MainPanel extends Component {
 	state = {
@@ -20,6 +21,10 @@ export class MainPanel extends Component {
 		if (chatRoom) {
 			this.addMessageListeners(chatRoom.id);
 		}
+	}
+
+	componentWillUnmount() {
+		this.state.messagesRef.off();
 	}
 
 	handleSearchMessages = () => {
@@ -43,12 +48,29 @@ export class MainPanel extends Component {
 		this.state.messagesRef.child(chatRoomId).on('child_added', (DataSnapshot) => {
 			messagesList.push(DataSnapshot.val());
 			this.setState({ messages: messagesList, messagesLoading: false });
+			this.userPostsCount(messagesList);
 		});
+	};
+
+	// []과 {}에서 오는 차이같음
+	userPostsCount = (messages) => {
+		let userPosts = messages.reduce((acc, message) => {
+			if (message.user.name in acc) {
+				acc[message.user.name].count += 1;
+			} else {
+				acc[message.user.name] = {
+					image: message.user.image,
+					count: 1,
+				};
+			}
+			return acc;
+		}, {});
+		this.props.dispatch(setUserPosts(userPosts));
 	};
 
 	renderMessages = (messages) =>
 		messages.length > 0 &&
-		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user | null} />);
+		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user} />);
 
 	render() {
 		const { messages, searchTerm, searchResults } = this.state;
