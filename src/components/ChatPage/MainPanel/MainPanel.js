@@ -14,18 +14,29 @@ export class MainPanel extends Component {
 		searchTerm: '',
 		searchResults: [],
 		searchLoading: false,
+		typingRef: firebase.database().ref('typing'),
+		typingUsers: [],
+		listenersList: [],
 	};
 
 	componentDidMount() {
 		const { chatRoom } = this.props;
 		if (chatRoom) {
 			this.addMessageListeners(chatRoom.id);
+			this.addTypingListeners(chatRoom.id);
 		}
 	}
 
 	componentWillUnmount() {
 		this.state.messagesRef.off();
+		this.removeListeners(this.state.listenersList);
 	}
+
+	removeListeners = (listeners) => {
+		listeners.forEach((listener) => {
+			listener.ref.child(listener.id).off(listener.event);
+		});
+	};
 
 	handleSearchMessages = () => {
 		const chatRoomMessages = [...this.state.messages];
@@ -52,7 +63,49 @@ export class MainPanel extends Component {
 		});
 	};
 
-	// []과 {}에서 오는 차이같음
+	addTypingListeners = (chatRoomId) => {
+		let typingUsers = [];
+
+		// DB에 Typing 정보가 들어오면 가져온후 렌더링
+		this.state.typingRef.child(chatRoomId).on('child_added', (DataSnapshot) => {
+			if (DataSnapshot.key !== this.props.user.uid) {
+				typingUsers = typingUsers.concat({
+					id: DataSnapshot.key,
+					name: DataSnapshot.val(),
+				});
+				this.setState({ typingUsers });
+			}
+		});
+
+		// listenersList state에 등록된 리스너를 넣어주기
+		this.addToListenersList(chatRoomId, this.state.typingRef, 'child_added');
+
+		// DB에 typing 정보가 제거되면
+		this.state.typingRef.child(chatRoomId).on('child_removed', (DataSnapshot) => {
+			const index = this.state.typingUsers.findIndex((user) => user.id === DataSnapshot.key);
+			if (index !== -1) {
+				typingUsers = typingUsers.filter((user) => user.id !== DataSnapshot.key);
+				this.setState({ typingUsers });
+			}
+		});
+
+		// listenersList state에 등록된 리스너를 넣어주기
+		this.addToListenersList(chatRoomId, this.state.typingRef, 'child_removed');
+	};
+
+	addToListenersList = (id, ref, event) => {
+		// 이미 등록된 리스너인지 확인
+		const index = this.state.listenersList.findIndex((listener) => {
+			return listener.id === id && listener.ref === ref && listener.event === event;
+		});
+
+		// listenersList 에 '새로' 등록된 리스너 추가
+		if (index === -1) {
+			const newListener = { id, ref, event };
+			this.setState({ listenersList: this.state.listenersList.concat(newListener) });
+		}
+	};
+
 	userPostsCount = (messages) => {
 		let userPosts = messages.reduce((acc, message) => {
 			if (message.user.name in acc) {
@@ -72,8 +125,11 @@ export class MainPanel extends Component {
 		messages.length > 0 &&
 		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user} />);
 
+	renderTypingUsers = (typingUsers) =>
+		typingUsers.length > 0 && typingUsers.map((user) => <span>{user.name}님이 채팅을 입력중...</span>);
+
 	render() {
-		const { messages, searchTerm, searchResults } = this.state;
+		const { messages, searchTerm, searchResults, typingUsers } = this.state;
 
 		return (
 			<div style={{ padding: '2rem 2rem 0 2rem' }}>
@@ -91,6 +147,7 @@ export class MainPanel extends Component {
 					}}
 				>
 					{searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
+					{this.renderTypingUsers(typingUsers)}
 				</div>
 
 				<MessageForm />

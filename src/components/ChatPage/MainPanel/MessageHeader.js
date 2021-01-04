@@ -9,6 +9,7 @@ import firebase from '../../../firebase';
 function MessageHeader({ handleSearchChange }) {
 	const user = useSelector((state) => state.user.currentUser);
 	const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
+	const chatRoomType = useSelector((state) => state.chatRoom.chatRoomType);
 	const userPosts = useSelector((state) => state.chatRoom.userPosts);
 	const isPrivateChatRoom = useSelector((state) => state.chatRoom.isPrivateChatRoom);
 	const [isFavorited, setIsFavorited] = useState(false);
@@ -127,16 +128,18 @@ function MessageHeader({ handleSearchChange }) {
 						</InputGroup>
 					</Col>
 				</Row>
-				<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-					<p>
-						<Image
-							src={chatRoom && chatRoom.createdBy.image}
-							roundedCircle
-							style={{ width: '30px', height: '30px', margin: '0 5px' }}
-						/>{' '}
-						{chatRoom && chatRoom.createdBy.name}
-					</p>
-				</div>
+				{chatRoomType !== 'private' && (
+					<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+						<p>
+							<Image
+								src={chatRoom && chatRoom.createdBy.image}
+								roundedCircle
+								style={{ width: '30px', height: '30px', margin: '0 5px' }}
+							/>{' '}
+							{chatRoom && chatRoom.createdBy.name}
+						</p>
+					</div>
+				)}
 				<Row>
 					<Col>
 						<Accordion>
