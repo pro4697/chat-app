@@ -14,7 +14,11 @@ function LoginPage() {
 			await firebase.auth().signInWithEmailAndPassword(data.email, data.password);
 			setLoading(false);
 		} catch (error) {
+			setErrorFromSubmit(error.message);
 			setLoading(false);
+			setTimeout(() => {
+				setErrorFromSubmit('');
+			}, 5000);
 		}
 	};
 

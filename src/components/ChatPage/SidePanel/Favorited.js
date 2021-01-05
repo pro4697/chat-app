@@ -25,7 +25,7 @@ export class Favorited extends Component {
 	}
 
 	removeListener = (userId) => {
-		this.state.usersRef.child(`${userId}/favorited`).ofF();
+		this.state.usersRef.child(`${userId}/favorited`).off();
 	};
 
 	addListeners = (userId) => {
