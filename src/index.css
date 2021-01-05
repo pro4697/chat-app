@@ -5,6 +5,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+/* LoginPage.js / RegisterPage.js */
 .auth-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -116,6 +117,7 @@ body {
 	-webkit-appearance: none;
 }
 
+/* messageForm.js */
 .message-form-button {
 	background: #7a84eb;
 	color: white;
@@ -130,4 +132,99 @@ body {
 
 .message-form-button:hover {
 	background: #636ee6;
+}
+
+/* message.js */
+.message {
+	margin-bottom: 3px;
+}
+
+.message-profile-img {
+	border-radius: 14px;
+	width: 40px;
+	height: 40px;
+	margin-right: 10px;
+	margin-left: -5px;
+}
+
+.message-mine-profile-img {
+	border-radius: 14px;
+	width: 40px;
+	height: 40px;
+	margin-right: -5px;
+	margin-left: 10px;
+}
+
+.message-mine {
+	flex-direction: row-reverse;
+	margin-bottom: 3px;
+}
+
+.message-info {
+}
+
+.message-mine-info {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+}
+
+.message-timestamp {
+	font-size: 10px;
+	color: grey;
+}
+
+.message-mine-timestamp {
+	font-size: 10px;
+	color: grey;
+	margin: 0 5px;
+	line-height: 20px;
+}
+
+.message-img {
+	max-width: 300px;
+}
+
+.message-mine-img {
+	float: right;
+	max-width: 300px;
+}
+
+.message-content {
+	display: inline;
+	float: left;
+	max-width: 300px;
+	white-space: pre-wrap;
+	color: whitesmoke;
+	background-color: #7a84eb;
+	border-radius: 10px;
+	padding: 8px;
+}
+
+.message-mine-content {
+	display: inline;
+	float: right;
+	max-width: 300px;
+	white-space: pre-wrap;
+	color: whitesmoke;
+	background-color: #7a84eb;
+	border-radius: 10px;
+	padding: 8px;
+}
+
+/* =================================
+             Scroll-y 
+================================= */
+::-webkit-scrollbar {
+	width: 4px;
+}
+::-webkit-scrollbar-track {
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.389);
+	border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgb(77, 80, 83);
 }

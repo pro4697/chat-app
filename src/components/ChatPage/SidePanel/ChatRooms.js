@@ -86,6 +86,11 @@ export class ChatRooms extends Component {
 					notifications[index].count = DataSnapshot.numChildren() - lastTotal;
 				}
 			}
+			// 현재 채팅방에서 나오기전까지 읽지않은 메시지 갯수는 0으로 유지해야함
+			else {
+				notifications[index].count = 0;
+				notifications[index].lastKnownTotal = DataSnapshot.numChildren();
+			}
 			// total property에 현재 전체 미시지 개수 넣기
 			notifications[index].total = DataSnapshot.numChildren();
 		}

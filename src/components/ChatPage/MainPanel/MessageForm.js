@@ -17,10 +17,6 @@ function MessageForm() {
 	const storageRef = firebase.storage().ref();
 	const typingRef = firebase.database().ref('typing');
 
-	const handleChange = (e) => {
-		setContent(e.target.value);
-	};
-
 	const createMessage = (fileUrl = null) => {
 		const message = {
 			timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -36,6 +32,10 @@ function MessageForm() {
 			message['content'] = content;
 		}
 		return message;
+	};
+
+	const handleChange = (e) => {
+		setContent(e.target.value);
 	};
 
 	const handleSubmit = async () => {
@@ -87,7 +87,9 @@ function MessageForm() {
 
 		try {
 			// 스토리지에 파일저장
-			let uploadTask = storageRef.child(filePath).put(file, metadata);
+			file.rename('???.jpg');
+			alert(file.name);
+			let uploadTask = storageRef.child(filePath).push().put(file, metadata);
 
 			// 저장 진행 퍼센테이지 구하기
 			uploadTask.on(
@@ -115,7 +117,12 @@ function MessageForm() {
 		}
 	};
 
-	const handleKeyDown = () => {
+	const handleKeyDown = (e) => {
+		if (e.ctrlKey && e.key === 'Enter') {
+			setContent(content + '\n');
+		} else if (e.key === 'Enter') {
+			handleSubmit();
+		}
 		if (content) {
 			typingRef.child(chatRoom.id).child(user.uid).set(user.displayName);
 		} else {
@@ -143,7 +150,7 @@ function MessageForm() {
 				))}
 			</div>
 
-			<Row>
+			<Row style={{ marginTop: '-40px' }}>
 				<Col>
 					<button onClick={handleSubmit} className='message-form-button' style={{ width: '100%' }} disabled={loading}>
 						SEND

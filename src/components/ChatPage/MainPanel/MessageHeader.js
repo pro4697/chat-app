@@ -11,7 +11,6 @@ function MessageHeader({ handleSearchChange }) {
 	const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
 	const chatRoomType = useSelector((state) => state.chatRoom.chatRoomType);
 	const userPosts = useSelector((state) => state.chatRoom.userPosts);
-	const isPrivateChatRoom = useSelector((state) => state.chatRoom.isPrivateChatRoom);
 	const [isFavorited, setIsFavorited] = useState(false);
 	const usersRef = firebase.database().ref('users');
 
@@ -80,6 +79,7 @@ function MessageHeader({ handleSearchChange }) {
 				</Media>
 			));
 	};
+
 	return (
 		<div
 			style={{
@@ -95,19 +95,10 @@ function MessageHeader({ handleSearchChange }) {
 				<Row>
 					<Col>
 						<h2>
-							{isPrivateChatRoom ? (
-								<FaLock style={{ marginBottom: '10px' }} />
-							) : (
-								<FaLockOpen style={{ marginBottom: '10px' }} />
-							)}
 							{chatRoom && ` ${chatRoom.name} `}
-							{!isPrivateChatRoom && (
+							{chatRoomType !== 'private' && (
 								<span style={{ cursor: 'pointer' }} onClick={handleFavorite}>
-									{isFavorited ? (
-										<MdFavorite style={{ borderBottom: '10px' }} />
-									) : (
-										<MdFavoriteBorder style={{ borderBottom: '10px' }} />
-									)}
+									{isFavorited ? <MdFavorite /> : <MdFavoriteBorder />}
 								</span>
 							)}
 						</h2>

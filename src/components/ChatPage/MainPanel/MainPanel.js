@@ -5,8 +5,11 @@ import Message from './Message';
 import MessageForm from './MessageForm';
 import firebase from '../../../firebase';
 import { setUserPosts } from '../../../redux/actions/chatRoom_action';
+import Skeleton from '../../../commons/components/Skeleton';
 
 export class MainPanel extends Component {
+	messageEndRef = React.createRef();
+
 	state = {
 		messages: [],
 		messagesRef: firebase.database().ref('messages'),
@@ -24,6 +27,12 @@ export class MainPanel extends Component {
 		if (chatRoom) {
 			this.addMessageListeners(chatRoom.id);
 			this.addTypingListeners(chatRoom.id);
+		}
+	}
+
+	componentDidUpdate() {
+		if (this.messageEndRef) {
+			this.messageEndRef.scrollIntoView(); // 동작안함
 		}
 	}
 
@@ -128,8 +137,17 @@ export class MainPanel extends Component {
 	renderTypingUsers = (typingUsers) =>
 		typingUsers.length > 0 && typingUsers.map((user) => <span>{user.name}님이 채팅을 입력중...</span>);
 
+	renderMessageSkeleton = (loading) =>
+		loading && (
+			<>
+				{[...Array(8)].map((v, i) => (
+					<Skeleton key={i} />
+				))}
+			</>
+		);
+
 	render() {
-		const { messages, searchTerm, searchResults, typingUsers } = this.state;
+		const { messages, searchTerm, searchResults, typingUsers, messagesLoading } = this.state;
 
 		return (
 			<div style={{ padding: '2rem 2rem 0 2rem' }}>
@@ -138,7 +156,7 @@ export class MainPanel extends Component {
 				<div
 					style={{
 						width: '100%',
-						height: '450px',
+						height: '500px',
 						border: '.2rem solid #ececec',
 						borderRadius: '4px',
 						padding: '1rem',
@@ -146,8 +164,12 @@ export class MainPanel extends Component {
 						overflowY: 'auto',
 					}}
 				>
+					{this.renderMessageSkeleton(messagesLoading)}
 					{searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
 					{this.renderTypingUsers(typingUsers)}
+
+					{/* node는 현재 div를 가리키고 있음 */}
+					<div ref={(node) => (this.messageEndRef = node)} />
 				</div>
 
 				<MessageForm />

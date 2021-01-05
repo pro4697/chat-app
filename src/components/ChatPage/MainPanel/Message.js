@@ -3,37 +3,24 @@ import { Media } from 'react-bootstrap';
 import moment from 'moment';
 
 function Message({ message, user }) {
+	const isMine = user && message.user.id === user.uid ? '-mine' : '';
 	const timeFromNow = (timestamp) => moment(timestamp).fromNow();
 
 	const isImage = (message) => {
 		return message.hasOwnProperty('image') && !message.hasOwnProperty('content');
 	};
-
-	const isMessageMine = (message, user) => {
-		if (user) {
-			return message.user.id === user.uid;
-		}
-	};
-
 	return (
-		<Media style={{ marginBottom: '3px' }}>
-			<img
-				style={{ borderRadius: '10px' }}
-				width={48}
-				height={48}
-				className='mr-3'
-				src={message.user.image}
-				alt={message.user.name}
-			/>
-			<Media.Body style={{ backgroundColor: isMessageMine(message, user) && '#ececec' }}>
-				<h6>
+		<Media className={`message${isMine}`}>
+			<img className={`message${isMine}-profile-img`} src={message.user.image} alt={message.user.name} />
+			<Media.Body>
+				<h6 className={`message${isMine}-info`}>
 					{`${message.user.name} `}
-					<span style={{ fontSize: '10px', color: 'gray' }}>{timeFromNow(message.timestamp)}</span>
+					<span className={`message${isMine}-timestamp`}>{timeFromNow(message.timestamp)}</span>
 				</h6>
 				{isImage(message) ? (
-					<img style={{ maxWidth: '300px' }} alt='이미지' src={message.image} />
+					<img className={`message${isMine}-img`} alt='이미지' src={message.image} />
 				) : (
-					<p>{message.content}</p>
+					<pre className={`message${isMine}-content`}>{message.content}</pre>
 				)}
 			</Media.Body>
 		</Media>

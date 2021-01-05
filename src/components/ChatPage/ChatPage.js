@@ -12,7 +12,7 @@ function ChatPage() {
 			<div style={{ width: '300px' }}>
 				<SidePanel key={currentUser && currentUser.uid} />
 			</div>
-			<div style={{ width: '100%' }}>
+			<div style={{ minWidth: '500px', margin: 'auto' }}>
 				<MainPanel key={currentChatRoom && currentChatRoom.id} />
 			</div>
 		</div>
