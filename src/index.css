@@ -183,11 +183,13 @@ body {
 
 .message-img {
 	max-width: 300px;
+	height: 300px;
 }
 
 .message-mine-img {
 	float: right;
 	max-width: 300px;
+	height: 300px;
 }
 
 .message-content {
