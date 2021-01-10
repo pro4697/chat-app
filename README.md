@@ -1,7 +1,7 @@
 # Chat App (2021.01)
 
 > 실시간 채팅 Web App.
-![MacBook Pro 16](https://user-images.githubusercontent.com/43352126/104121362-eb16ee80-5380-11eb-8d17-5eb98c284ef5.png)
+![chat-app_github](https://user-images.githubusercontent.com/43352126/104121408-5660c080-5381-11eb-8f81-9c16dc911bb7.png)
 
 ### Preview
 
