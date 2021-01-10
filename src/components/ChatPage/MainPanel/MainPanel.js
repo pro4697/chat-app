@@ -27,6 +27,7 @@ export class MainPanel extends Component {
 		if (chatRoom) {
 			this.addMessageListeners(chatRoom.id);
 			this.addTypingListeners(chatRoom.id);
+			this.setState({ messagesLoading: false });
 		}
 	}
 
@@ -62,7 +63,9 @@ export class MainPanel extends Component {
 	};
 
 	handleSearchChange = (e) => {
-		this.setState({ searchTerm: e.target.value, searchLoading: true }, () => this.handleSearchMessages());
+		this.setState({ searchTerm: e.target.value, searchLoading: true }, () =>
+			this.handleSearchMessages()
+		);
 	};
 
 	addMessageListeners = (chatRoomId) => {
@@ -134,10 +137,13 @@ export class MainPanel extends Component {
 
 	renderMessages = (messages) =>
 		messages.length > 0 &&
-		messages.map((message) => <Message key={message.timestamp} message={message} user={this.props.user} />);
+		messages.map((message) => (
+			<Message key={message.timestamp} message={message} user={this.props.user} />
+		));
 
 	renderTypingUsers = (typingUsers) =>
-		typingUsers.length > 0 && typingUsers.map((user) => <span>{user.name}님이 채팅을 입력중...</span>);
+		typingUsers.length > 0 &&
+		typingUsers.map((user) => <span key={user.id}>{user.name}님이 채팅을 입력중...</span>);
 
 	renderMessageSkeleton = (loading) =>
 		loading && (

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Badge } from 'react-bootstrap';
 import { AiFillStar } from 'react-icons/ai';
 import firebase from '../../../firebase';
 import { setCurrentChatRoom, setChatRoomType } from '../../../redux/actions/chatRoom_action';
@@ -36,7 +35,9 @@ export class Favorited extends Component {
 			.child('favorited')
 			.on('child_added', (DataSnapshot) => {
 				const favoritedChatRoom = { id: DataSnapshot.key, ...DataSnapshot.val() };
-				this.setState({ favoritedChatRooms: [...this.state.favoritedChatRooms, favoritedChatRoom] });
+				this.setState({
+					favoritedChatRooms: [...this.state.favoritedChatRooms, favoritedChatRoom],
+				});
 			});
 
 		usersRef
@@ -67,7 +68,9 @@ export class Favorited extends Component {
 					key={room.id}
 					style={{
 						backgroundColor:
-							room.id === this.state.activeChatRoomId && this.props.chatRoomType === 'favorited' && '#ffffff45',
+							room.id === this.state.activeChatRoomId &&
+							this.props.chatRoomType === 'favorited' &&
+							'#ffffff45',
 						marginLeft: '10px',
 						paddingLeft: '10px',
 						borderRadius: '5px',
@@ -91,7 +94,9 @@ export class Favorited extends Component {
 					<AiFillStar style={{ marginRight: '3px' }} />
 					FAVORITED {`(${this.state.favoritedChatRooms.length})`}
 				</span>
-				<ul style={{ listStyleType: 'none', padding: '0' }}>{this.renderFavoritedChatRooms(favoritedChatRooms)}</ul>
+				<ul style={{ listStyleType: 'none', padding: '0' }}>
+					{this.renderFavoritedChatRooms(favoritedChatRooms)}
+				</ul>
 			</div>
 		);
 	}

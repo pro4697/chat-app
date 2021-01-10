@@ -7,3 +7,4 @@ export const SET_PHOTO_URL = 'set_photo_url';
 export const SET_CURRENT_CHAT_ROOM = 'set_current_chat_room';
 export const SET_CHAT_ROOM_TYPE = 'set_chat_room_type';
 export const SET_USER_POSTS = 'set_user_posts';
+export const CLEAR_CHAT_ROOM = 'clear_chat_room';

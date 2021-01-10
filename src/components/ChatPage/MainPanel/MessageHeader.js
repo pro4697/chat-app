@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Container, Row, Col, InputGroup, FormControl, Image, Accordion, Card, Button, Media } from 'react-bootstrap';
-import { FaLock, FaLockOpen } from 'react-icons/fa';
+import {
+	Container,
+	Row,
+	Col,
+	InputGroup,
+	FormControl,
+	Image,
+	Accordion,
+	Card,
+	Button,
+	Media,
+} from 'react-bootstrap';
 import { MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
 import firebase from '../../../firebase';
@@ -74,7 +84,7 @@ function MessageHeader({ handleSearchChange }) {
 					<Media.Body>
 						<h6>{key}</h6>
 						<p>{`${val.count} 개`}</p>
-						{i != arr.length - 1 && <hr />}
+						{i !== arr.length - 1 && <hr />}
 					</Media.Body>
 				</Media>
 			));

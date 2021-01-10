@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, ProgressBar, Row, Col } from 'react-bootstrap';
 import mine from 'mime-types';
@@ -16,6 +16,15 @@ function MessageForm() {
 	const messagesRef = firebase.database().ref('messages');
 	const storageRef = firebase.storage().ref();
 	const typingRef = firebase.database().ref('typing');
+
+	// unmount시 typing정보 제거
+	useEffect(() => {
+		return () => {
+			if (chatRoom?.id) {
+				typingRef.child(chatRoom.id).child(user.uid).remove();
+			}
+		};
+	}, []);
 
 	const createMessage = (fileUrl = null) => {
 		const message = {
@@ -87,15 +96,15 @@ function MessageForm() {
 
 		try {
 			// 스토리지에 파일저장
-			file.rename('???.jpg');
-			alert(file.name);
-			let uploadTask = storageRef.child(filePath).push().put(file, metadata);
+			let uploadTask = storageRef.child(filePath).put(file, metadata);
 
 			// 저장 진행 퍼센테이지 구하기
 			uploadTask.on(
 				'state_change',
 				(UploadTaskSnapshot) => {
-					const percentage = Math.round((UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100);
+					const percentage = Math.round(
+						(UploadTaskSnapshot.bytesTransferred / UploadTaskSnapshot.totalBytes) * 100
+					);
 					setPercentage(percentage);
 				},
 				(error) => {
@@ -134,7 +143,13 @@ function MessageForm() {
 		<div>
 			<Form onSubmit={handleSubmit}>
 				<Form.Group controlId='exampleForm.ControlTextarea1'>
-					<Form.Control onKeyDown={handleKeyDown} value={content} onChange={handleChange} as='textarea' rows={3} />
+					<Form.Control
+						onKeyDown={handleKeyDown}
+						value={content}
+						onChange={handleChange}
+						as='textarea'
+						rows={3}
+					/>
 				</Form.Group>
 			</Form>
 
@@ -152,7 +167,12 @@ function MessageForm() {
 
 			<Row style={{ marginTop: '-40px' }}>
 				<Col>
-					<button onClick={handleSubmit} className='message-form-button' style={{ width: '100%' }} disabled={loading}>
+					<button
+						onClick={handleSubmit}
+						className='message-form-button'
+						style={{ width: '100%' }}
+						disabled={loading}
+					>
 						SEND
 					</button>
 				</Col>

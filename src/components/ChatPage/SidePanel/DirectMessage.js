@@ -18,14 +18,30 @@ export class DirectMessage extends Component {
 
 	addUsersListeners = async (currentUserId) => {
 		const { usersRef } = this.state;
-		let usersList = [];
 
-		usersRef.on('child_added', (DataSnapshot) => {
+		await usersRef.once('value').then((data) => {
+			let userId = [...Object.keys(data.val())];
+			let userData = [...Object.values(data.val())];
+			userData = userData
+				.map((user, i) => {
+					return { ...user, uid: userId[i] };
+				})
+				.filter((user) => user.uid !== currentUserId);
+
+			this.setState({ users: userData });
+		});
+
+		usersRef.on('child_changed', (DataSnapshot) => {
 			if (currentUserId !== DataSnapshot.key) {
+				let usersList = [...this.state.users];
 				let user = DataSnapshot.val();
-				user['uid'] = DataSnapshot.key;
-				user['status'] = 'offline';
-				usersList.push(user);
+				let index = usersList.findIndex((user) => user.uid === DataSnapshot.key);
+				if (index !== -1) {
+					usersList[index].status = user.status;
+				} else {
+					user['uid'] = DataSnapshot.key;
+					usersList.push(user);
+				}
 				this.setState({ users: usersList });
 			}
 		});
@@ -33,7 +49,9 @@ export class DirectMessage extends Component {
 
 	getChatRoomId = (targetUserId) => {
 		const currentUserId = this.props.user.uid;
-		return targetUserId > currentUserId ? `${targetUserId}/${currentUserId}` : `${currentUserId}/${targetUserId}`;
+		return targetUserId > currentUserId
+			? `${targetUserId}/${currentUserId}`
+			: `${currentUserId}/${targetUserId}`;
 	};
 
 	changeChatRoom = (user) => {
@@ -58,7 +76,9 @@ export class DirectMessage extends Component {
 				onClick={() => this.changeChatRoom(user)}
 				style={{
 					backgroundColor:
-						user.uid === this.state.activeChatRoom && this.props.chatRoomType === 'private' && '#ffffff45',
+						user.uid === this.state.activeChatRoom &&
+						this.props.chatRoomType === 'private' &&
+						'#ffffff45',
 					marginLeft: '10px',
 					paddingLeft: '10px',
 					borderRadius: '5px',
@@ -66,7 +86,17 @@ export class DirectMessage extends Component {
 				}}
 				key={user.uid}
 			>
-				# {user.name}
+				<div
+					style={{
+						display: 'inline-block',
+						backgroundColor: user.status === 'online' ? '#31a24c' : 'darkRed',
+						width: '10px',
+						height: '10px',
+						borderRadius: '10px',
+						marginRight: '5px',
+					}}
+				/>
+				{user.name}
 			</li>
 		));
 

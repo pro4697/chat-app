@@ -1,4 +1,9 @@
-import { SET_CURRENT_CHAT_ROOM, SET_CHAT_ROOM_TYPE, SET_USER_POSTS } from '../actions/types';
+import {
+	SET_CURRENT_CHAT_ROOM,
+	SET_CHAT_ROOM_TYPE,
+	SET_USER_POSTS,
+	CLEAR_CHAT_ROOM,
+} from '../actions/types';
 
 const initialChatRoomState = {
 	currentChatRoom: null,
@@ -21,6 +26,11 @@ export default function (state = initialChatRoomState, action) {
 			return {
 				...state,
 				userPosts: action.payload,
+			};
+		case CLEAR_CHAT_ROOM:
+			return {
+				...state,
+				currentChatRoom: null,
 			};
 		default:
 			return state;
