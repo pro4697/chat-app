@@ -1,6 +1,7 @@
 # Chat App (2021.01)
 
 > 실시간 채팅 Web App.
+![chat-app_github](https://user-images.githubusercontent.com/43352126/104121408-5660c080-5381-11eb-8f81-9c16dc911bb7.png)
 
 ### Preview
 
