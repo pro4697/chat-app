@@ -21,12 +21,19 @@ function App() {
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
 				dispatch(setUser(user));
+				let preState = sessionStorage.getItem('isRegister') === 'true';
+				sessionStorage.setItem('isRegister', 'false');
 
-				// 회원가입시 auth 업데이트 시간차로 인해 접근 거절 문제를 방지
-				setTimeout(() => {
+				// 회원가입시 auth 업데이트 시간차로 인해 DB접근 거절 오류 방지
+				// 회원가입후 main화면으로 오는경우 회원가입시 online처리하므로 online으로 상태 변화 건너뜀
+				if (preState) {
+					setTimeout(() => {
+						window.location.replace('/');
+					}, 2500);
+				} else {
 					firebase.database().ref('users').child(user.uid).update({ status: 'online' });
-				}, 3000);
-				history.push('/');
+					history.push('/');
+				}
 			} else {
 				dispatch(clearUser());
 				history.push('/login');

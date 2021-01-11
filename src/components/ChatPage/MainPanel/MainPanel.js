@@ -33,8 +33,6 @@ export class MainPanel extends Component {
 
 	componentDidUpdate() {
 		if (this.messageEndRef) {
-			// enter키로 메시지 보낼시동작안함
-			// this.messageEndRef.scrollIntoView({ behavior: 'smooth' });
 			this.messageEndRef.scrollIntoView();
 		}
 	}

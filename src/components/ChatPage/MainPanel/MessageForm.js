@@ -130,6 +130,7 @@ function MessageForm() {
 		if (e.ctrlKey && e.key === 'Enter') {
 			setContent(content + '\n');
 		} else if (e.key === 'Enter') {
+			e.preventDefault();
 			handleSubmit();
 		}
 		if (content) {
@@ -154,7 +155,12 @@ function MessageForm() {
 			</Form>
 
 			{!(percentage === 0 || percentage === 100) && (
-				<ProgressBar variant='warning' label={`${percentage}%`} now={percentage} />
+				<ProgressBar
+					style={{ marginBottom: '20px' }}
+					variant='warning'
+					label={`${percentage}%`}
+					now={percentage}
+				/>
 			)}
 
 			<div>

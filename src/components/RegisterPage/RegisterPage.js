@@ -15,6 +15,7 @@ function RegisterPage() {
 	const onSubmit = async (data) => {
 		try {
 			setLoading(true);
+			sessionStorage.setItem('isRegister', 'true');
 			let createdUser = await firebase
 				.auth()
 				.createUserWithEmailAndPassword(data.email, data.password);
@@ -30,8 +31,6 @@ function RegisterPage() {
 				image: createdUser.user.photoURL,
 				status: 'online',
 			});
-
-			setLoading(false);
 		} catch (error) {
 			setErrorFromSubmit(error.message);
 			setTimeout(() => {
@@ -82,7 +81,7 @@ function RegisterPage() {
 
 				{errorFromSubmit && <p>{errorFromSubmit}</p>}
 
-				<input type='submit' disabled={loading} />
+				<input type='submit' value={loading ? '처리중...' : '회원가입'} disabled={loading} />
 				<Link style={{ color: 'grey', textDecoration: 'none', fontSize: '14px' }} to='login'>
 					이미 아이디가 있다면...
 				</Link>
